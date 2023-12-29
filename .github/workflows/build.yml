@@ -20,10 +20,7 @@ jobs:
     - name: Build LLVM
       run: |
         bash ci.sh llvm
-      env:
-        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-        ARCH: arm64
-
+      
     - name: Create tar.gz file
       run: |
         tar -czvf clang.tar.gz -C install .
@@ -31,9 +28,7 @@ jobs:
     - name: Build binutils
       run: |
         bash ci.sh binutils
-      env:
-        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-        ARCH: arm64
+    - run: ls
 
     - name: Upload Clang Releases tar.gz
       uses: actions/upload-artifact@v3
