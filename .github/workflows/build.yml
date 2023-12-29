@@ -7,6 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - uses: rokibhasansagar/slimhub_actions@main
     - uses: nttld/setup-ndk@v1
       with:
         ndk-version: r26
