@@ -1,4 +1,4 @@
-/#!/usr/bin/env bash
+#!/usr/bin/env bash
 
 base=$(dirname "$(readlink -f "$0")")
 install=$base/install
