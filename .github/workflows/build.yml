@@ -1,0 +1,33 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: |
+        bash ci.sh deps
+      
+    - name: Build LLVM
+      run: |
+        bash ci.sh llvm
+
+    - name: Create tar.gz file
+      run: |
+        tar -czvf clang.tar.gz -C install .
+
+    - name: Build binutils
+      run: |
+        bash ci.sh binutils
+
+    - name: Upload Clang Releases tar.gz
+      uses: softprops/action-gh-release@v1
+      with:
+        files: /home/runner/work/tc-build/**/*clang.tar.gz
+        token: ${{ secrets.TOKEN_GITHUB }}
+        name: "Clang"
+        tag_name: "v1.clang"
