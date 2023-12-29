@@ -7,6 +7,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - uses: nttld/setup-ndk@v1
+      with:
+        ndk-version: r26
+        add-to-path: false
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
@@ -15,6 +19,8 @@ jobs:
     - name: Build LLVM
       run: |
         bash ci.sh llvm
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
     - name: Create tar.gz file
       run: |
@@ -23,11 +29,12 @@ jobs:
     - name: Build binutils
       run: |
         bash ci.sh binutils
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
     - name: Upload Clang Releases tar.gz
-      uses: softprops/action-gh-release@v1
+      uses: actions/upload-artifact@v3
       with:
-        files: /home/runner/work/tc-build/**/*clang.tar.gz
-        token: ${{ secrets.TOKEN_GITHUB }}
-        name: "Clang"
-        tag_name: "v1.clang"
+        name: clang
+        path: clang.tar.gz
+        
