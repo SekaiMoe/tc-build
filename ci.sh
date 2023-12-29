@@ -111,7 +111,7 @@ function do_llvm() {
         --ref release/17.x \
         --shallow-clone \
         --show-build-commands \
-        --targets ARM AArch64 \
+        --targets AArch64 \
         "${extra_args[@]}"
 }
 
