@@ -8,10 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: rokibhasansagar/slimhub_actions@main
-    - uses: nttld/setup-ndk@v1
-      with:
-        ndk-version: r26
-        add-to-path: false
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
@@ -21,17 +17,18 @@ jobs:
       continue-on-error: true
       run: |
         bash ci.sh llvm
-      
-    - name: Create tar.gz file
-      continue-on-error: true
-      run: |
-        tar -czvf clang.tar.gz -C install .
-
+    
     - name: Build binutils
       continue-on-error: true
       run: |
         bash ci.sh binutils
     - run: ls
+
+    - name: Create tar.gz file
+      continue-on-error: true
+      run: |
+        tar -czvf clang.tar.gz -C install .
+
 
     - name: Upload Clang Releases tar.gz
       uses: actions/upload-artifact@v3
@@ -43,10 +40,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: rokibhasansagar/slimhub_actions@main
-    - uses: nttld/setup-ndk@v1
-      with:
-        ndk-version: r26
-        add-to-path: false
+    - name: Download NDK
+      run: |
+        wget https://dl.google.com/android/repository/android-ndk-r26b-linux.zip -O ndk.zip
+        unzip ndk.zip
+        export HME=$(pwd)
+        cd android-ndk-r26b/toolchains/llvm/linux-x86_64/bin
+        for file in $(ls llvm-*); do
+            ln -s -v "$file" "aarch64-linux-android31-${file#llvm-}"
+        done
+        cd $HME
+        rm -rf -v ndk.zip
+        
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
@@ -55,23 +60,26 @@ jobs:
     - name: Build LLVM
       continue-on-error: true
       run: |
+        export ARCH=arm64
+        export ./android-ndk-r26b/toolchains/llvm/prebuilt/linux-x86_64
+        export PATH=$CLANG_PATH/bin:$PATH
+        export CROSS_COMPILE=$CLANG_PATH/bin/llvm- COMPILE_ARM32=$CLANG_PATH/bin/llvm- CLANG_TRIPLE=aarch64-linux-android31- CC=clang
         bash ci.sh llvm
-      env:
-        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-        ARCH: arm64
+
+    - name: Build binutils
+      continue-on-error: true
+      run: |
+        export ARCH=arm64
+        export ./android-ndk-r26b/toolchains/llvm/prebuilt/linux-x86_64
+        export PATH=$CLANG_PATH/bin:$PATH
+        export CROSS_COMPILE=$CLANG_PATH/bin/llvm- COMPILE_ARM32=$CLANG_PATH/bin/llvm- CLANG_TRIPLE=aarch64-linux-android31- CC=clang
+        bash ci.sh binutils
 
     - name: Create tar.gz file
       continue-on-error: true
       run: |
         tar -czvf clang.tar.gz -C install .
 
-    - name: Build binutils
-      continue-on-error: true
-      run: |
-        bash ci.sh binutils
-      env:
-        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-        ARCH: arm64
 
     - name: Upload Clang Releases tar.gz
       uses: actions/upload-artifact@v3
