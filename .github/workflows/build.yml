@@ -36,3 +36,43 @@ jobs:
         name: clang
         path: clang.tar.gz
         
+  build-arm64:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: rokibhasansagar/slimhub_actions@main
+    - uses: nttld/setup-ndk@v1
+      with:
+        ndk-version: r26
+        add-to-path: false
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: |
+        bash ci.sh deps
+      
+    - name: Build LLVM
+      continue-on-error: true
+      run: |
+        bash ci.sh llvm
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+        ARCH: arm64
+
+    - name: Create tar.gz file
+      continue-on-error: true
+      run: |
+        tar -czvf clang.tar.gz -C install .
+
+    - name: Build binutils
+      continue-on-error: true
+      run: |
+        bash ci.sh binutils
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+        ARCH: arm64
+
+    - name: Upload Clang Releases tar.gz
+      uses: actions/upload-artifact@v3
+      with:
+        name: clang
+        path: clang-arm64.tar.gz
+        
