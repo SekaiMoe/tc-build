@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+/#!/usr/bin/env bash
 
 base=$(dirname "$(readlink -f "$0")")
 install=$base/install
@@ -111,7 +111,7 @@ function do_llvm() {
         --ref release/17.x \
         --shallow-clone \
         --show-build-commands \
-        --targets ARM AArch64  \
+        --targets ARM AArch64 \
         "${extra_args[@]}"
 }
 
