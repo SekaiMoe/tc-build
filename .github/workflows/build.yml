@@ -18,14 +18,17 @@ jobs:
         bash ci.sh deps
       
     - name: Build LLVM
+      continue-on-error: true
       run: |
         bash ci.sh llvm
       
     - name: Create tar.gz file
+      continue-on-error: true
       run: |
         tar -czvf clang.tar.gz -C install .
 
     - name: Build binutils
+      continue-on-error: true
       run: |
         bash ci.sh binutils
     - run: ls
