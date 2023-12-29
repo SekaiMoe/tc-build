@@ -2,6 +2,7 @@ name: Build
 
 on:
   workflow_dispatch:
+  push:
   
 jobs:
   build:
@@ -42,10 +43,10 @@ jobs:
     - uses: rokibhasansagar/slimhub_actions@main
     - name: Download NDK
       run: |
-        wget https://dl.google.com/android/repository/android-ndk-r26b-linux.zip -O ndk.zip
+        wget -q https://dl.google.com/android/repository/android-ndk-r26b-linux.zip -O ndk.zip
         unzip ndk.zip
         export HME=$(pwd)
-        cd android-ndk-r26b/toolchains/llvm/linux-x86_64/bin
+        cd android-ndk-r26b/toolchains/llvm/prebuilt/linux-x86_64/bin
         for file in $(ls llvm-*); do
             ln -s -v "$file" "aarch64-linux-android31-${file#llvm-}"
         done
